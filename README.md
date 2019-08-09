@@ -1,17 +1,38 @@
+A four-dimensional game.
+
+# Status
+
+This currently only has a renderer.
+
+It does not do exactly what I want; see problem below.
+
+If I solve that problem, I will probably turn this into an actual game.
+
+If I don't, I will probably abandon this project.
+
+
 # Controls
 
 You must click the screen to lock the pointer before mouse controls will work.
 
 Look left/right: Move mouse left/right
+
 Look up/down: Move mouse up/down
+
 Look ana/kata: Scroll up/down
 
+
 Move forward/backward: W/S keys
+
 Move left/right: A/D keys
+
 Move up/down: Space/Shift keys
+
 Move ana/kata: Q/E keys
 
+
 Rotate 3D screen left/right: left/right arrow keys
+
 Rotate 3D screen up/down: up/down arrow keys
 
 # Problem: 1D vs 2D textures
