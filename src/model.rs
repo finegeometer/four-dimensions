@@ -65,17 +65,30 @@ impl Model {
             screen_theta: 0.0,
             screen_phi: 0.0,
             //
-            position: na::Vector4::new(8.5, 8.5, 8.5, 8.5),
-            horizontal_orientation: na::UnitQuaternion::identity(),
-            vertical_angle: 0.,
+            position: na::Vector4::new(
+                8.508_503_748_531_79,
+                8.505_781_659_781_6,
+                8.504_372_659_81,
+                8.507_813_668_1,
+            ),
+            horizontal_orientation: na::UnitQuaternion::new(na::Vector3::new(
+                0.004_278_651_483_965_198,
+                0.004_368_756_483_652_789,
+                0.003_428_975_823_465_897,
+            )),
+            vertical_angle: 0.007_513_658_36,
         })
     }
 
     pub fn view(&self) -> Result<(), JsValue> {
+        web_sys::console::time_with_label("view");
+
         (self.render)(
             &mesh::Mesh::new(&self.world).project(self.projection_matrix()),
             self.screen_matrix().into(),
         )?;
+
+        web_sys::console::time_end_with_label("view");
 
         Ok(())
     }
