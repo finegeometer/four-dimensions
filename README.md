@@ -2,14 +2,19 @@ A four-dimensional game.
 
 # Status
 
-This currently only has a renderer.
+This currently only has a renderer. But it finally works! (mostly)
 
-It does not do exactly what I want; see problem below.
+More to be done in the future.
 
-If I solve that problem, I will probably turn this into an actual game.
+## Todo
 
-If I don't, I will probably abandon this project.
+Remove remnants of 1D textures.
 
+Improve performance. (fn view takes 100 - 130 ms on my computer, and that's with a simple example scene)
+
+Fix the known-to-be-incorrect code.
+
+More!
 
 # Controls
 
@@ -34,22 +39,6 @@ Move ana/kata: Q/E keys
 Rotate 3D screen left/right: left/right arrow keys
 
 Rotate 3D screen up/down: up/down arrow keys
-
-# Problem: 1D vs 2D textures
-
-If you compile and run the code as it currently stands, it will render the scene with 1D textures (line-art).
-I want it to instead use 2D textures (plane-art), but I have repeatedly been unsuccessful at implementing occlusion.
-If I get 2D textures working properly, I will remove the 1D texture code.
-
-To switch the code to 2D textures, several changes need to be made to the code.
-All of these are marked by a comment containing the string "TXPRBLM".
-- In `fn project` in the second `impl Mesh` in mesh.rs,
-	- Turn off occlusion by removing the relevant line.
-	- Replace the line `texcoord: ...` as marked in the code.
-- In `fn cube` in `impl Facet` in mesh.rs, replace the contents of `texture: ...` as marked in the code.
-- In `impl Space for Texture` in mesh/space.rs, change Dim from `na::U1` to `na::U2`
-- Replace all of mesh/texture.rs with the commented code in that file.
-- In render/to_tex.rs, replace the line `gl.draw_arrays(GL::LINES, ...);` with `gl.draw_arrays(GL::TRIANGLES, ...);`.
 
 # License
 
