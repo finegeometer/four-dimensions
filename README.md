@@ -10,7 +10,7 @@ More to be done in the future.
 
 Remove remnants of 1D textures.
 
-Improve performance. (fn view takes 100 - 130 ms on my computer, and that's with a simple example scene)
+Improve performance. (fn view takes 100 to 130 ms on my computer, and that's with a simple example scene)
 
 Fix the known-to-be-incorrect code.
 
