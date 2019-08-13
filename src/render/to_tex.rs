@@ -159,9 +159,6 @@ pub fn make_fn(
             &mat.into_iter().map(|&x| x as f32).collect::<Vec<_>>(),
         );
 
-        /* TXPRBLM: IF USING 1D TEXTURES, USE THIS */
-        // gl.draw_arrays(GL::LINES, 0, (data.len() / 8) as i32);
-        /* TXPRBLM: IF USING 2D TEXTURES, USE THIS */
         gl.draw_arrays(GL::TRIANGLES, 0, (data.len() / 8) as i32);
 
         Ok(())

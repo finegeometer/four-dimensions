@@ -32,7 +32,7 @@ features = [
   'EventTarget',
   'HtmlElement',
   'HtmlCanvasElement',
-  'HtmlImageElement',
+  'HtmlParagraphElement',
   'MouseEvent',
   'Node',
   'KeyboardEvent',

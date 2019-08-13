@@ -1,4 +1,4 @@
-use crate::{mesh, render};
+use crate::{fps, mesh, render};
 use core::f64::consts::*;
 use std::collections::HashSet;
 use wasm_bindgen::prelude::*;
@@ -9,14 +9,17 @@ use nalgebra as na;
 /// All of the information stored by the program
 pub struct Model {
     keys: HashSet<String>,
-    time: Option<f64>,
+    fps: Option<fps::FrameCounter>,
     //
     pub window: web_sys::Window,
     pub document: web_sys::Document,
     pub canvas: web_sys::HtmlCanvasElement,
+    pub info_box: web_sys::HtmlParagraphElement,
 
     #[allow(clippy::type_complexity)]
     render: Box<dyn Fn(&[render::Vertex], render::Mat4Wrapper) -> Result<(), JsValue>>,
+    occluded_mesh: Option<Vec<render::Vertex>>,
+
     world: Box<[[[[bool; 16]; 16]; 16]; 16]>,
     //
     screen_theta: f64,
@@ -42,55 +45,60 @@ impl Model {
         canvas.set_attribute("height", "800")?;
         body.append_child(&canvas)?;
 
+        let info_box = document
+            .create_element("p")?
+            .dyn_into::<web_sys::HtmlParagraphElement>()?;
+        body.append_child(&info_box)?;
+
         let render = Box::new(render::make_fn(&canvas)?);
 
         let mut world = Box::new([[[[false; 16]; 16]; 16]; 16]);
 
         world[8][8][8][8] = true;
-        world[8][8][8][9] = true;
-        world[9][8][8][9] = true;
-        world[9][8][8][10] = true;
-        world[8][7][8][9] = true;
 
         Ok(Model {
             keys: HashSet::new(),
-            time: None,
+            fps: None,
             //
             window,
             document,
             canvas,
+            info_box,
             render,
+            occluded_mesh: None,
             world,
             //
-            screen_theta: 0.0,
-            screen_phi: 0.0,
+            screen_theta: 0.3,
+            screen_phi: -0.2,
             //
-            position: na::Vector4::new(
-                8.508_503_748_531_79,
-                8.505_781_659_781_6,
-                8.504_372_659_81,
-                8.507_813_668_1,
-            ),
-            horizontal_orientation: na::UnitQuaternion::new(na::Vector3::new(
-                0.004_278_651_483_965_198,
-                0.004_368_756_483_652_789,
-                0.003_428_975_823_465_897,
-            )),
-            vertical_angle: 0.007_513_658_36,
+            position: na::Vector4::new(8.5, 8.5, 8.5, 8.5),
+            horizontal_orientation: na::UnitQuaternion::new(na::Vector3::new(0., 0., 0.)),
+            vertical_angle: 0.,
         })
     }
 
-    pub fn view(&self) -> Result<(), JsValue> {
+    pub fn view(&mut self) -> Result<(), JsValue> {
         web_sys::console::time_with_label("view");
 
-        (self.render)(
-            &mesh::Mesh::new(&self.world).project(self.projection_matrix()),
-            self.screen_matrix().into(),
-        )?;
+        let occluded_mesh: &[render::Vertex];
+
+        if let Some(x) = &self.occluded_mesh {
+            occluded_mesh = x;
+        } else {
+            self.occluded_mesh =
+                Some(mesh::Mesh::new(&self.world).project(self.projection_matrix()));
+            occluded_mesh = &self.occluded_mesh.as_ref().unwrap_throw(); // Is there a better way to do this?
+        }
+
+        (self.render)(occluded_mesh, self.screen_matrix().into())?;
 
         web_sys::console::time_end_with_label("view");
 
         Ok(())
+    }
+
+    pub fn needs_rerender(&mut self) {
+        self.occluded_mesh = None;
     }
 
     pub fn update(&mut self, msg: Msg) -> Result<(), JsValue> {
@@ -110,6 +118,7 @@ impl Model {
                     self.vertical_angle -= f64::from(y) * 3e-3;
                     self.vertical_angle = self.vertical_angle.min(FRAC_PI_2);
                     self.vertical_angle = self.vertical_angle.max(-FRAC_PI_2);
+                    self.needs_rerender();
                 }
             }
             Msg::MouseWheel(z) => {
@@ -117,23 +126,27 @@ impl Model {
                     self.horizontal_orientation *=
                         na::UnitQuaternion::new(na::Vector3::new(z * 1e-2, 0., 0.));
                 }
+                self.needs_rerender();
             }
             Msg::KeyUp(k) => {
                 self.keys.remove(&k.to_lowercase());
             }
             Msg::Frame(time) => {
                 let dt: f64;
-                if let Some(old_time) = self.time {
-                    dt = (time - old_time) * 1e-3;
+                if let Some(fps) = &mut self.fps {
+                    dt = fps.frame(time);
+
+                    self.info_box.set_inner_text(&format!("{}", fps));
+
+                    self.rotate_screen(dt);
+                    self.move_player(dt);
+
+                    self.eat_block();
+
+                    self.view()?;
                 } else {
-                    dt = 0.;
+                    self.fps = Some(<fps::FrameCounter>::new(time));
                 }
-                self.time = Some(time);
-
-                self.rotate_screen(dt);
-                self.move_player(dt);
-
-                self.view()?;
             }
         }
         Ok(())
@@ -164,27 +177,35 @@ impl Model {
         let m = self.horizontal_rotation().matrix() * dt;
         if self.keys.contains("w") {
             self.position += m * na::Vector4::w();
+            self.needs_rerender();
         }
         if self.keys.contains("s") {
             self.position -= m * na::Vector4::w();
+            self.needs_rerender();
         }
         if self.keys.contains("d") {
             self.position += m * na::Vector4::x();
+            self.needs_rerender();
         }
         if self.keys.contains("a") {
             self.position -= m * na::Vector4::x();
+            self.needs_rerender();
         }
         if self.keys.contains(" ") {
             self.position += m * na::Vector4::y();
+            self.needs_rerender();
         }
         if self.keys.contains("shift") {
             self.position -= m * na::Vector4::y();
+            self.needs_rerender();
         }
         if self.keys.contains("q") {
             self.position += m * na::Vector4::z();
+            self.needs_rerender();
         }
         if self.keys.contains("e") {
             self.position -= m * na::Vector4::z();
+            self.needs_rerender();
         }
     }
 
@@ -284,6 +305,11 @@ impl Model {
         )
         .inverse();
         projection * isometry.to_homogeneous()
+    }
+
+    fn eat_block(&mut self) {
+        let [x, y, z, w]: [f64; 4] = self.position.into();
+        self.world[x as usize][y as usize][z as usize][w as usize] = true;
     }
 }
 

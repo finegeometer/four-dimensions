@@ -1,6 +1,7 @@
 #![deny(unsafe_code)]
 #![allow(dead_code)]
 
+mod fps;
 mod mesh;
 mod model;
 mod render;
@@ -17,7 +18,7 @@ use std::rc::Rc;
 pub fn run() -> Result<(), JsValue> {
     std::panic::set_hook(Box::new(console_error_panic_hook::hook));
     let state: Rc<RefCell<Model>> = Rc::new(RefCell::new(Model::init()?));
-    let model = state.borrow_mut();
+    let mut model = state.borrow_mut();
 
     // Handle clicks
     {

@@ -18,9 +18,6 @@ impl Space for Depth {
 
 pub struct Texture;
 impl Space for Texture {
-    /* TXPRBLM: IF USING 1D TEXTURES, USE THIS */
-    // type Dim = na::U1;
-    /* TXPRBLM: IF USING 2D TEXTURES, USE THIS */
     type Dim = na::U2;
 }
 

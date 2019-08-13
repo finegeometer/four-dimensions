@@ -1,18 +1,16 @@
-A four-dimensional game.
+A four-dimensional game. Run around and eat the tesseracts by walking into them!
 
 # Status
 
-This currently only has a renderer. But it finally works! (mostly)
-
-More to be done in the future.
+It works, but has unacceptable performance. This should be fixable, but has not yet been fixed.
 
 ## Todo
-
-Remove remnants of 1D textures.
 
 Improve performance. (fn view takes 100 to 130 ms on my computer, and that's with a simple example scene)
 
 Fix the known-to-be-incorrect code.
+
+Do something with textures. I don't know what, but something.
 
 More!
 

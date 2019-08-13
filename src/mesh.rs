@@ -2,9 +2,7 @@ mod region;
 mod space;
 mod texture;
 
-mod poly1;
-mod poly2;
-use poly2 as poly;
+mod poly;
 
 // If I hadn't written this wrapper, I would have made dozens of errors writing this code.
 // I would have been unable to debug them all at the same time, and would have given up.
@@ -187,37 +185,7 @@ impl Facet<space::Facet> {
                 Linear(na::RowVector4::new(0., 0., -1., 1.)),
             ]
             .into(),
-            // texture: {
-            //     let mut out = vec![];
-
-            //     for &x in &[0.05, 0.2, 0.35, 0.5, 0.65, 0.8, 0.95] {
-            //         for &y in &[0.05, 0.95] {
-            //             out.push(texture::Texture::new([0.05, x, y], [0.95, x, y]));
-            //             out.push(texture::Texture::new([0.05, y, x], [0.95, y, x]));
-            //             out.push(texture::Texture::new([x, y, 0.05], [x, y, 0.95]));
-            //             out.push(texture::Texture::new([y, x, 0.05], [y, x, 0.95]));
-            //             out.push(texture::Texture::new([y, 0.05, x], [y, 0.95, x]));
-            //             out.push(texture::Texture::new([x, 0.05, y], [x, 0.95, y]));
-            //         }
-            //     }
-
-            //     out
-            // }
             texture: vec![
-                /* TXPRBLM: IF USING 1D TEXTURES, USE THESE */
-                // texture::Texture::new([0.05, 0.05, 0.05], [0.95, 0.05, 0.05]),
-                // texture::Texture::new([0.05, 0.05, 0.05], [0.05, 0.95, 0.05]),
-                // texture::Texture::new([0.05, 0.05, 0.05], [0.05, 0.05, 0.95]),
-                // texture::Texture::new([0.95, 0.95, 0.05], [0.05, 0.95, 0.05]),
-                // texture::Texture::new([0.95, 0.95, 0.05], [0.95, 0.05, 0.05]),
-                // texture::Texture::new([0.95, 0.95, 0.05], [0.95, 0.95, 0.95]),
-                // texture::Texture::new([0.95, 0.05, 0.95], [0.05, 0.05, 0.95]),
-                // texture::Texture::new([0.95, 0.05, 0.95], [0.95, 0.95, 0.95]),
-                // texture::Texture::new([0.95, 0.05, 0.95], [0.95, 0.05, 0.05]),
-                // texture::Texture::new([0.05, 0.95, 0.95], [0.95, 0.95, 0.95]),
-                // texture::Texture::new([0.05, 0.95, 0.95], [0.05, 0.05, 0.95]),
-                // texture::Texture::new([0.05, 0.95, 0.95], [0.05, 0.95, 0.05]),
-                /* TXPRBLM: IF USING 2D TEXTURES, USE THESE */
                 texture::Texture::new([0.05, 0.05, 0.05], [0.95, 0.05, 0.05], [0.05, 0.95, 0.05]),
                 texture::Texture::new([0.05, 0.05, 0.05], [0.05, 0.95, 0.05], [0.05, 0.05, 0.95]),
                 texture::Texture::new([0.05, 0.05, 0.05], [0.05, 0.05, 0.95], [0.95, 0.05, 0.05]),
@@ -255,9 +223,6 @@ impl Mesh {
                         vs.map(move |(a, sign)| Vertex {
                             pos: (m * a).0,
                             sign,
-                            /* TXPRBLM: IF USING 1D TEXTURES, USE THIS */
-                            // texcoord: a.0.insert_row(1, 0.5),
-                            /* TXPRBLM: IF USING 2D TEXTURES, USE THIS */
                             texcoord: a.0,
                         })
                     })
