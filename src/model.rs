@@ -78,7 +78,7 @@ impl Model {
     }
 
     pub fn view(&mut self) -> Result<(), JsValue> {
-        web_sys::console::time_with_label("view");
+        // web_sys::console::time_with_label("view");
 
         let occluded_mesh: &[render::Vertex];
 
@@ -92,7 +92,7 @@ impl Model {
 
         (self.render)(occluded_mesh, self.screen_matrix().into())?;
 
-        web_sys::console::time_end_with_label("view");
+        // web_sys::console::time_end_with_label("view");
 
         Ok(())
     }

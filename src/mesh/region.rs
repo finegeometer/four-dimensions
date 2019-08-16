@@ -70,6 +70,10 @@ where
     pub fn add_boundary(&mut self, h: Hyperplane<A>) {
         self.boundaries.push(h)
     }
+
+    pub fn iter<'r>(&'r self) -> impl Iterator<Item = Hyperplane<A>> + 'r {
+        self.boundaries.iter().cloned()
+    }
 }
 
 impl<A: Space> core::fmt::Debug for Region<A>
@@ -79,5 +83,15 @@ where
 {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         self.boundaries.fmt(f)
+    }
+}
+
+impl<A: Space> Clone for Region<A>
+where
+    A::Dim: na::DimNameAdd<na::U1>,
+    na::DefaultAllocator: na::allocator::Allocator<f64, na::U1, <Homogeneous<A> as Space>::Dim>,
+{
+    fn clone(&self) -> Self {
+        self.iter().collect::<Vec<_>>().into()
     }
 }

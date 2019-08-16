@@ -32,7 +32,7 @@ where
         }
     }
 
-    pub fn subtract_region(&mut self, region: super::region::Region<A>)
+    pub fn subtract_region(&mut self, region: &super::region::Region<A>)
     where
         na::DefaultAllocator: na::allocator::Allocator<f64, na::U1, <Homogeneous<A> as Space>::Dim>,
         Projective<f64, super::space::Texture, A>: Copy,

@@ -1,7 +1,4 @@
-#![deny(unsafe_code)]
-#![allow(dead_code)]
-
-
+// #![allow(dead_code)]
 
 use core::ops::Bound::*;
 use std::collections::{BTreeMap, BTreeSet};

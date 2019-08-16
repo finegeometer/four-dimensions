@@ -1,5 +1,5 @@
-#![deny(unsafe_code)]
-#![allow(dead_code)]
+#![forbid(unsafe_code)]
+// #![allow(dead_code)]
 
 mod fps;
 mod mesh;
@@ -14,9 +14,10 @@ use model::{Model, Msg};
 use std::cell::RefCell;
 use std::rc::Rc;
 
-#[wasm_bindgen(start)]
+#[wasm_bindgen]
 pub fn run() -> Result<(), JsValue> {
     std::panic::set_hook(Box::new(console_error_panic_hook::hook));
+
     let state: Rc<RefCell<Model>> = Rc::new(RefCell::new(Model::init()?));
     let mut model = state.borrow_mut();
 

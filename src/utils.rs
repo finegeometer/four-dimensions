@@ -11,6 +11,7 @@ pub fn as_f32_array(v: &[f32]) -> Result<js_sys::Float32Array, JsValue> {
     Ok(js_sys::Float32Array::new(&memory_buffer).subarray(location, location + v.len() as u32))
 }
 
+#[allow(dead_code)]
 pub fn log<T: core::fmt::Debug>(x: T) {
     web_sys::console::log_1(&format!("{:?}", x).into());
 }
