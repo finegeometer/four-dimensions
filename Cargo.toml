@@ -19,6 +19,8 @@ alga = { version = "0.9", default-features = false }
 num-traits = { version = "0.2", default-features = false }
 vector-spaces = { git = "https://github.com/finegeometer/vector-spaces-rs" }
 
+polygon3 = { git = "https://github.com/finegeometer/polygon3-rs" }
+
 console_error_panic_hook = "0.1.6"
 
 [dependencies.web-sys]

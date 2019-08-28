@@ -32,15 +32,20 @@ where
         }
     }
 
-    pub fn subtract_region(&mut self, region: &super::region::Region<A>)
-    where
+    pub fn subtract_regions<'r>(
+        &'r mut self,
+        regions: impl IntoIterator<Item = &'r super::region::Region<A>>,
+    ) where
         na::DefaultAllocator: na::allocator::Allocator<f64, na::U1, <Homogeneous<A> as Space>::Dim>,
         Projective<f64, super::space::Texture, A>: Copy,
         Projective<f64, A, ()>: Copy,
     {
-        let region: super::region::Region<super::space::Texture> =
-            region.transform::<super::space::Texture>(self.embedding);
-        self.poly.subtract_region(region)
+        let embedding = self.embedding;
+        self.poly.subtract_regions(
+            regions
+                .into_iter()
+                .map(|r| r.transform::<super::space::Texture>(embedding)),
+        )
     }
 
     pub fn get_vertices(
