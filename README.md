@@ -6,7 +6,7 @@ It works, but its performance isn't great.
 
 ## Todo
 
-Benchmark, and improve performance.
+Benchmark, and improve performance. Hopefully enough that I can put air outside the cube without performance issues from all of those outside facets.
 
 Fix the known-to-be-incorrect code.
 
@@ -30,7 +30,7 @@ More!
 
 # Controls
 
-You must click the screen to lock the pointer before mouse controls will work.
+Click above the fps counter to start.
 
 Look left/right: Move mouse left/right
 

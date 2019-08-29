@@ -1,4 +1,4 @@
-use crate::{fps, mesh, render};
+use crate::{fps, render, world};
 use core::f64::consts::*;
 use std::collections::HashSet;
 use wasm_bindgen::prelude::*;
@@ -20,7 +20,7 @@ pub struct Model {
     render: Box<dyn Fn(&[render::Vertex], render::Mat4Wrapper) -> Result<(), JsValue>>,
     occluded_mesh: Option<Vec<render::Vertex>>,
 
-    world: Box<[[[[bool; 16]; 16]; 16]; 16]>,
+    world: world::World,
     //
     screen_theta: f64,
     screen_phi: f64,
@@ -52,9 +52,7 @@ impl Model {
 
         let render = Box::new(render::make_fn(&canvas)?);
 
-        let mut world = Box::new([[[[false; 16]; 16]; 16]; 16]);
-
-        world[8][8][8][8] = true;
+        let world = world::World::new();
 
         Ok(Model {
             keys: HashSet::new(),
@@ -71,7 +69,7 @@ impl Model {
             screen_theta: 0.3,
             screen_phi: -0.2,
             //
-            position: na::Vector4::new(8.5, 8.5, 8.5, 8.5),
+            position: na::Vector4::new(1.5, 1.5, 1.5, 1.5),
             horizontal_orientation: na::UnitQuaternion::new(na::Vector3::new(0., 0., 0.)),
             vertical_angle: 0.,
         })
@@ -86,7 +84,8 @@ impl Model {
             occluded_mesh = x;
         } else {
             self.occluded_mesh = Some(
-                mesh::new(&self.world)
+                self.world
+                    .mesh()
                     .project(self.projection_matrix())
                     .flat_map(|render_4d::Triangle { negated, vertices }| {
                         let sign = if negated { -1. } else { 1. };
@@ -333,7 +332,12 @@ impl Model {
 
     fn eat_block(&mut self) {
         let [x, y, z, w]: [f64; 4] = self.position.into();
-        self.world[x as usize][y as usize][z as usize][w as usize] = true;
+        if let Some(block) = self
+            .world
+            .block_mut([x as isize, y as isize, z as isize, w as isize])
+        {
+            *block = world::Block::Air;
+        }
     }
 }
 

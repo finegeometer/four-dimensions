@@ -2,10 +2,10 @@
 // #![allow(dead_code)]
 
 mod fps;
-mod mesh;
 mod model;
 mod render;
 mod utils;
+mod world;
 
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
