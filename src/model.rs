@@ -85,8 +85,32 @@ impl Model {
         if let Some(x) = &self.occluded_mesh {
             occluded_mesh = x;
         } else {
-            self.occluded_mesh =
-                Some(mesh::Mesh::new(&self.world).project(self.projection_matrix()));
+            self.occluded_mesh = Some(
+                mesh::new(&self.world)
+                    .project(self.projection_matrix())
+                    .flat_map(|render_4d::Triangle { negated, vertices }| {
+                        let sign = if negated { -1. } else { 1. };
+                        let [a, b, c] = vertices;
+                        vec![
+                            crate::render::Vertex {
+                                pos: a.position.into(),
+                                texcoord: a.texcoord.into(),
+                                sign,
+                            },
+                            crate::render::Vertex {
+                                pos: b.position.into(),
+                                texcoord: b.texcoord.into(),
+                                sign,
+                            },
+                            crate::render::Vertex {
+                                pos: c.position.into(),
+                                texcoord: c.texcoord.into(),
+                                sign,
+                            },
+                        ]
+                    })
+                    .collect(),
+            );
             occluded_mesh = &self.occluded_mesh.as_ref().unwrap_throw(); // Is there a better way to do this?
         }
 
