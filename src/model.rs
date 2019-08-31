@@ -332,10 +332,12 @@ impl Model {
 
     fn eat_block(&mut self) {
         let [x, y, z, w]: [f64; 4] = self.position.into();
-        if let Some(block) = self
-            .world
-            .block_mut([x as isize, y as isize, z as isize, w as isize])
-        {
+        if let Some(block) = self.world.block_mut([
+            x.floor() as isize,
+            y.floor() as isize,
+            z.floor() as isize,
+            w.floor() as isize,
+        ]) {
             *block = world::Block::Air;
         }
     }

@@ -405,7 +405,7 @@ dependencies = [
 [[package]]
 name = "render-4d"
 version = "0.0.0"
-source = "git+https://github.com/finegeometer/render-4d-rs#ab5accaebde95df508e1ddb59144412170196bc3"
+source = "git+https://github.com/finegeometer/render-4d-rs#99a14ef4176655cf8ec23a6eaacc6c3c40f817bc"
 dependencies = [
  "alga 0.9.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "nalgebra 0.18.1 (registry+https://github.com/rust-lang/crates.io-index)",

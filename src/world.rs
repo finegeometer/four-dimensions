@@ -49,7 +49,7 @@ impl World {
     pub fn mesh(&self) -> render_4d::Mesh {
     	Mesh {
     		facets: (0..3).flat_map(|i| (0..3).flat_map(move |j| (0..3).flat_map(move |k| (-1..3).flat_map(move |l| {
-	    		let f1 = if self.block([i,j,k,l]).unwrap_or(&Block::Block).is_transparent() ^ self.block([i,j,k,l+1]).unwrap_or(&Block::Block).is_transparent() {
+	    		let f1 = if !self.block([i,j,k,l]).unwrap_or(&Block::Air).is_transparent() && self.block([i,j,k,l+1]).unwrap_or(&Block::Air).is_transparent() {
 	                Some(Facet::new_cube(na::Matrix5x4::new(
 	                    1., 0., 0., i as f64,
 	                    0., 1., 0., j as f64,
@@ -60,18 +60,18 @@ impl World {
 	    		} else {
 	    			None
 	    		};
-	    		let f2 = if self.block([j,k,l,i]).unwrap_or(&Block::Block).is_transparent() ^ self.block([j,k,l+1,i]).unwrap_or(&Block::Block).is_transparent() {
+	    		let f2 = if !self.block([j,i,l,k]).unwrap_or(&Block::Air).is_transparent() && self.block([j,i,l+1,k]).unwrap_or(&Block::Air).is_transparent() {
 	                Some(Facet::new_cube(na::Matrix5x4::new(
 	                    0., 1., 0., j as f64,
-	                    0., 0., 1., k as f64,
-	                    0., 0., 0., l as f64 + 1.,
 	                    1., 0., 0., i as f64,
+	                    0., 0., 0., l as f64 + 1.,
+	                    0., 0., 1., k as f64,
 	                    0., 0., 0., 1.,
 	                )))
 	    		} else {
 	    			None
 	    		};
-	    		let f3 = if self.block([k,l,i,j]).unwrap_or(&Block::Block).is_transparent() ^ self.block([k,l+1,i,j]).unwrap_or(&Block::Block).is_transparent() {
+	    		let f3 = if !self.block([k,l,i,j]).unwrap_or(&Block::Air).is_transparent() && self.block([k,l+1,i,j]).unwrap_or(&Block::Air).is_transparent() {
 	                Some(Facet::new_cube(na::Matrix5x4::new(
 	                    0., 0., 1., k as f64,
 	                    0., 0., 0., l as f64 + 1.,
@@ -82,19 +82,65 @@ impl World {
 	    		} else {
 	    			None
 	    		};
-	    		let f4 = if self.block([l,i,j,k]).unwrap_or(&Block::Block).is_transparent() ^ self.block([l+1,i,j,k]).unwrap_or(&Block::Block).is_transparent() {
+	    		let f4 = if !self.block([l,k,j,i]).unwrap_or(&Block::Air).is_transparent() && self.block([l+1,k,j,i]).unwrap_or(&Block::Air).is_transparent() {
 	                Some(Facet::new_cube(na::Matrix5x4::new(
 	                    0., 0., 0., l as f64 + 1.,
-	                    1., 0., 0., i as f64,
-	                    0., 1., 0., j as f64,
 	                    0., 0., 1., k as f64,
+	                    0., 1., 0., j as f64,
+	                    1., 0., 0., i as f64,
 	                    0., 0., 0., 1.,
 	                )))
 	    		} else {
 	    			None
 	    		};
 
-	    		vec![f1, f2, f3, f4].into_iter().filter_map(identity)
+	    		let f5 = if self.block([j,i,k,l]).unwrap_or(&Block::Air).is_transparent() && !self.block([j,i,k,l+1]).unwrap_or(&Block::Air).is_transparent() {
+	                Some(Facet::new_cube(na::Matrix5x4::new(
+	                    0., 1., 0., j as f64,
+	                    1., 0., 0., i as f64,
+	                    0., 0., 1., k as f64,
+	                    0., 0., 0., l as f64 + 1.,
+	                    0., 0., 0., 1.,
+	                )))
+	    		} else {
+	    			None
+	    		};
+	    		let f6 = if self.block([i,j,l,k]).unwrap_or(&Block::Air).is_transparent() && !self.block([i,j,l+1,k]).unwrap_or(&Block::Air).is_transparent() {
+	                Some(Facet::new_cube(na::Matrix5x4::new(
+	                    1., 0., 0., i as f64,
+	                    0., 1., 0., j as f64,
+	                    0., 0., 0., l as f64 + 1.,
+	                    0., 0., 1., k as f64,
+	                    0., 0., 0., 1.,
+	                )))
+	    		} else {
+	    			None
+	    		};
+	    		let f7 = if self.block([k,l,j,i]).unwrap_or(&Block::Air).is_transparent() && !self.block([k,l+1,j,i]).unwrap_or(&Block::Air).is_transparent() {
+	                Some(Facet::new_cube(na::Matrix5x4::new(
+	                    0., 0., 1., k as f64,
+	                    0., 0., 0., l as f64 + 1.,
+	                    0., 1., 0., j as f64,
+	                    1., 0., 0., i as f64,
+	                    0., 0., 0., 1.,
+	                )))
+	    		} else {
+	    			None
+	    		};
+	    		let f8 = if self.block([l,k,i,j]).unwrap_or(&Block::Air).is_transparent() && !self.block([l+1,k,i,j]).unwrap_or(&Block::Air).is_transparent() {
+	                Some(Facet::new_cube(na::Matrix5x4::new(
+	                    0., 0., 0., l as f64 + 1.,
+	                    0., 0., 1., k as f64,
+	                    1., 0., 0., i as f64,
+	                    0., 1., 0., j as f64,
+	                    0., 0., 0., 1.,
+	                )))
+	    		} else {
+	    			None
+	    		};
+
+
+	    		vec![f1, f2, f3, f4, f5, f6, f7, f8].into_iter().filter_map(identity)
 	    	})))).collect()
     	}
     }

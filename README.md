@@ -2,20 +2,19 @@ A four-dimensional game. Run around and eat the tesseracts by walking into them!
 
 # Status
 
-It works, but its performance isn't great.
+The performance isn't great, but the game is playable. (I have successfully eaten all 81 tesseracts.)
 
 ## Todo
 
-Benchmark, and improve performance. Hopefully enough that I can put air outside the cube without performance issues from all of those outside facets.
+Fix the known-to-be-incorrect code. Also fix other bugs.
 
-Fix the known-to-be-incorrect code.
+Make the game better. (Win screen, "nom" sound)
 
 Do something with textures. I don't know what, but something.
 
 Document code better.
 
 Seperate concerns more:
-	4D -> 3D rendering (own package? complete with benchmarks?)
 
 	display / input (Different for wasm vs native? Should I add native? Make own module, so can swap out)
 	3D -> 2D (depends on display system)
@@ -26,7 +25,7 @@ Seperate concerns more:
 
 Integrate with VR.
 
-More!
+More optimization is always good!
 
 # Controls
 
