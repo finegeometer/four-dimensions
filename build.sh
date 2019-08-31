@@ -3,5 +3,5 @@
 set -ex
 
 rustfmt src/lib.rs
-wasm-pack build --target web
+wasm-pack build --release --target web
 python3 -m http.server
