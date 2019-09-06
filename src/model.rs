@@ -17,8 +17,8 @@ pub struct Model {
     pub info_box: web_sys::HtmlParagraphElement,
 
     #[allow(clippy::type_complexity)]
-    render: Box<dyn Fn(&[render::Vertex], render::Mat4Wrapper) -> Result<(), JsValue>>,
-    occluded_mesh: Option<Vec<render::Vertex>>,
+    render: Box<dyn Fn(&[render_4d::Triangle], render::Mat4Wrapper) -> Result<(), JsValue>>,
+    occluded_mesh: Option<Vec<render_4d::Triangle>>,
 
     world: world::World,
     //
@@ -78,7 +78,7 @@ impl Model {
     pub fn view(&mut self) -> Result<(), JsValue> {
         // web_sys::console::time_with_label("view");
 
-        let occluded_mesh: &[render::Vertex];
+        let occluded_mesh: &[render_4d::Triangle];
 
         if let Some(x) = &self.occluded_mesh {
             occluded_mesh = x;
@@ -87,27 +87,6 @@ impl Model {
                 self.world
                     .mesh()
                     .project(self.projection_matrix())
-                    .flat_map(|render_4d::Triangle { negated, vertices }| {
-                        let sign = if negated { -1. } else { 1. };
-                        let [a, b, c] = vertices;
-                        vec![
-                            crate::render::Vertex {
-                                pos: a.position.into(),
-                                texcoord: a.texcoord.into(),
-                                sign,
-                            },
-                            crate::render::Vertex {
-                                pos: b.position.into(),
-                                texcoord: b.texcoord.into(),
-                                sign,
-                            },
-                            crate::render::Vertex {
-                                pos: c.position.into(),
-                                texcoord: c.texcoord.into(),
-                                sign,
-                            },
-                        ]
-                    })
                     .collect(),
             );
             occluded_mesh = &self.occluded_mesh.as_ref().unwrap_throw(); // Is there a better way to do this?

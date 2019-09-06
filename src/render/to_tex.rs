@@ -18,8 +18,8 @@ uniform mat4 proj_3d_screen;
 
 void main() {
     vsign = sign;
-	vtexcoord = texcoord;
-	gl_Position = proj_3d_screen * pos;
+    vtexcoord = texcoord;
+    gl_Position = proj_3d_screen * pos;
 }
 
 "#;
@@ -41,43 +41,25 @@ void main() {
 
 "#;
 
-type VectorIter<'r, N> = nalgebra::base::iter::MatrixIter<
-    'r,
-    f64,
-    N,
-    nalgebra::U1,
-    nalgebra::base::storage::Owned<f64, N, nalgebra::U1>,
->;
-
-pub struct Vertex {
-    pub pos: nalgebra::Vector4<f64>,
-    pub texcoord: nalgebra::Vector3<f64>,
-    pub sign: f64,
-}
-
-impl<'r> IntoIterator for &'r Vertex {
-    type Item = &'r f64;
-    type IntoIter = std::iter::Chain<
-        std::iter::Chain<VectorIter<'r, nalgebra::U4>, VectorIter<'r, nalgebra::U3>>,
-        std::iter::Once<&'r f64>,
-    >;
-
-    fn into_iter(self) -> Self::IntoIter {
-        let Vertex {
-            pos,
-            texcoord,
-            sign,
-        } = self;
-        pos.iter()
-            .chain(texcoord.iter())
-            .chain(std::iter::once(sign))
-    }
+fn iter_triangles(triangles: &[render_4d::Triangle]) -> impl Iterator<Item = f64> + '_ {
+    triangles
+        .iter()
+        .flat_map(|render_4d::Triangle { vertices, negated }| {
+            let sign = if *negated { &-1.0 } else { &1.0 };
+            vertices
+                .iter()
+                .flat_map(move |render_4d::Vertex { position, texcoord }| {
+                    position.iter().chain(texcoord).chain(std::iter::once(sign))
+                })
+        })
+        .copied()
 }
 
 pub fn make_fn(
     gl: Rc<GL>,
     render_texture: &web_sys::WebGlTexture,
-) -> Result<impl 'static + Fn(&[Vertex], Mat4Wrapper) -> Result<(), JsValue>, JsValue> {
+) -> Result<impl 'static + Fn(&[render_4d::Triangle], Mat4Wrapper) -> Result<(), JsValue>, JsValue>
+{
     let program = Program::new(Rc::clone(&gl), VERTEX_SHADER, FRAGMENT_SHADER)?;
 
     let pos_loc = program.attribute("pos")?;
@@ -129,8 +111,8 @@ pub fn make_fn(
     gl.tex_parameteri(GL::TEXTURE_2D, GL::TEXTURE_WRAP_S, GL::CLAMP_TO_EDGE as i32);
     gl.tex_parameteri(GL::TEXTURE_2D, GL::TEXTURE_WRAP_T, GL::REPEAT as i32);
 
-    Ok(move |data: &[Vertex], mat: Mat4Wrapper| {
-        let data: Vec<f32> = data.iter().flatten().map(|&x| x as f32).collect();
+    Ok(move |data: &[render_4d::Triangle], mat: Mat4Wrapper| {
+        let data: Vec<f32> = iter_triangles(data).map(|x| x as f32).collect();
 
         gl.bind_framebuffer(GL::FRAMEBUFFER, Some(&framebuffer));
         gl.bind_vertex_array(Some(&vao));

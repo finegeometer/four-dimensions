@@ -5,7 +5,7 @@ mod from_tex;
 mod to_tex;
 
 use std::rc::Rc;
-pub use to_tex::{Mat4Wrapper, Vertex};
+pub use to_tex::Mat4Wrapper;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 
@@ -13,7 +13,10 @@ type GL = web_sys::WebGl2RenderingContext;
 
 pub fn make_fn(
     canvas: &web_sys::HtmlCanvasElement,
-) -> Result<impl 'static + Fn(&[Vertex], to_tex::Mat4Wrapper) -> Result<(), JsValue>, JsValue> {
+) -> Result<
+    impl 'static + Fn(&[render_4d::Triangle], to_tex::Mat4Wrapper) -> Result<(), JsValue>,
+    JsValue,
+> {
     let gl = canvas
         .get_context("webgl2")?
         .ok_or("\"webgl2\" context identifier not supported.")?
@@ -50,7 +53,7 @@ pub fn make_fn(
     let to_tex = to_tex::make_fn(Rc::clone(&gl), &tex)?;
     let from_tex = from_tex::make_fn(gl)?;
 
-    Ok(move |data: &[Vertex], mat| {
+    Ok(move |data: &[render_4d::Triangle], mat| {
         to_tex(data, mat)?;
         from_tex(&tex);
         Ok(())
